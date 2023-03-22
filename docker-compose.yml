@@ -1,0 +1,59 @@
+version: '3.3'
+services:
+  rabbit-tgtest:
+    image: heidiks/rabbitmq-delayed-message-exchange:latest
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=password
+      - TZ=Europe/Warsaw
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - ./rabbit:/var/lib/rabbitmq
+    networks:
+      - backend
+  db-tgtest:
+    image: mysql:8.0
+    restart: always
+    environment:
+      - MYSQL_DATABASE=transfergo_notification
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASS}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASS}
+    ports:
+      - '3306:3306'
+    volumes:
+      - ./db:/var/lib/mysql
+    networks:
+      - backend
+  web:
+    image: nginx:latest
+    depends_on:
+      - db-tgtest
+      - php-fpm-tgtest
+    ports:
+        - "8080:80"
+    volumes:
+      - ./init/default.conf:/etc/nginx/conf.d/default.conf
+      - ./src:/var/www/html
+    networks:
+      - backend
+  php-fpm-tgtest:
+    container_name: php-fpm
+    build:
+      context: .
+    depends_on:
+      - db-tgtest
+    volumes:
+        - ./src:/var/www/html
+    links:
+      - db-tgtest
+    networks:
+      - backend
+volumes:
+  db:
+    driver: local
+networks:
+  backend:
+    driver: bridge

@@ -1,0 +1,12 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: transfergo notifications test
+            description: Example application for test
+            version: 1.0.0
+        tags:
+            - name: Notification
+              description: 'Notifications API'
+    areas: # to filter documented areas
+        path_patterns:
+            - ^/v1/api(?!/doc$) # Accepts routes under /api except /api/doc
