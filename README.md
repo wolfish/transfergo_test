@@ -18,12 +18,17 @@
 ## 3. Running consumer
 - Inside container run `php bin/console messenger:consume notification` to start rabbit consumer
 
-## 4. Tests
+## 4. User throttling settings
+- In `.env` you can find configuration for user throttling:
+  - `USER_THROTTLE_HOURS` - how many hours back is checked for user message count
+  - `USER_THROTTLE_LIMIT` - limit of messages sent to user
+
+## 5. Tests
 - Run `php bin/console doctrine:database:create --env=test` to create database for tests
 - Run `php bin/console doctrine:migrations:migrate --env=test --no-interaction` to create database structure
 - Run `php bin/phpunit` to run tests
 
-## 5. Accessing APIs
+## 6. Accessing APIs
 ### By generated frontend
 - Open your browser on [http://localhost:8080/api/doc](http://localhost:8080/api/doc)
 - Use method by expanding them and clicking "Try it out"
@@ -32,7 +37,7 @@
 ### By external program (like Postman)
 - Use OpenApi 3.0 specification available on [http://localhost:8080/api/doc.json](http://localhost:8080/api/doc.json)
 
-## 6. What's next?
+## 7. What's next?
 Stuff to improve with more time:
 - move Doctrine operations to Command and Queries
 - expand basic tests
