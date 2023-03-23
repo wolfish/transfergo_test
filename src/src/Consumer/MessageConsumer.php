@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Consumer;
 
 use App\Factory\NotificationFactory;
-use App\Message\MessageInterface;
+use App\Message\NotificationMessageInterface;
+use App\Repository\NotificationMessageRepository;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Notifier\NotifierInterface;
 use Symfony\Component\Notifier\TexterInterface;
 
 #[AsMessageHandler()]
@@ -15,24 +17,30 @@ class MessageConsumer
 
     private NotificationFactory $factory;
 
-    private TexterInterface $transport;
+    private NotifierInterface $transport;
+
+    private NotificationMessageRepository $repository;
 
     public function __construct(
         NotificationFactory $factory,
-        TexterInterface $transport
+        NotifierInterface $transport,
+        NotificationMessageRepository $repository
     )
     {
         $this->factory = $factory;
         $this->transport = $transport;
+        $this->repository = $repository;
     }
 
-    public function __invoke(MessageInterface $message)
+    public function __invoke(NotificationMessageInterface $message) : bool
     {
-        $gateway = $this->factory->createGateway($message, $this->transport);
+        $notification = $this->repository->findOneBy([
+            'unique_id' => $message->getUniqueId()
+        ]);
 
-        $result = $gateway->send();
+        $gateway = $this->factory->createGateway($message, $this->transport, $notification);
         
-        return $result;
+        return $gateway->send();
     }
 
 }

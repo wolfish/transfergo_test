@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Gateway;
 
-use App\Message\MessageInterface;
+use App\Message\NotificationMessageInterface;
 
 interface NotificationGatewayInterface
 {
 
-    public function setMessage(MessageInterface $message) : self;
+    public function setMessage(NotificationMessageInterface $message) : self;
 
     public function send() : bool;
 

@@ -19,23 +19,22 @@ class NotificationMessage
     #[ORM\Column(length: 50)]
     private string $type;
 
+    #[ORM\Column(length: 255, unique: true)]
+    private string $unique_id;
+
     #[ORM\Column(length: 255)]
     private string $user_id;
 
     #[ORM\Column(length: 100)]
     private ?string $recipient = null;
 
-    #[ORM\Column(length: 100, nullable: true)]
-    private ?string $sender_name = null;
-
-    #[ORM\Column(length: 100, nullable: true)]
-    private ?string $message_title = null;
-
     #[ORM\Column(length: 500)]
     private ?string $message_text = null;
 
-    #[ORM\Column]
-    private ?bool $is_sent = null;
+    #[ORM\Column(options: [
+        'default' => false
+    ])]
+    private bool $is_sent = false;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, options: [
         'default' => 'CURRENT_TIMESTAMP'
@@ -62,30 +61,6 @@ class NotificationMessage
         return $this;
     }
 
-    public function getSenderName(): ?string
-    {
-        return $this->sender_name;
-    }
-
-    public function setSenderName(?string $sender_name): self
-    {
-        $this->sender_name = $sender_name;
-
-        return $this;
-    }
-
-    public function getMessageTitle(): ?string
-    {
-        return $this->message_title;
-    }
-
-    public function setMessageTitle(?string $message_title): self
-    {
-        $this->message_title = $message_title;
-
-        return $this;
-    }
-
     public function getMessageText(): ?string
     {
         return $this->message_text;
@@ -94,18 +69,6 @@ class NotificationMessage
     public function setMessageText(string $message_text): self
     {
         $this->message_text = $message_text;
-
-        return $this;
-    }
-
-    public function isIsSent(): ?bool
-    {
-        return $this->is_sent;
-    }
-
-    public function setIsSent(bool $is_sent): self
-    {
-        $this->is_sent = $is_sent;
 
         return $this;
     }
@@ -154,6 +117,30 @@ class NotificationMessage
     public function setUserId(string $user_id): self
     {
         $this->user_id = $user_id;
+
+        return $this;
+    }
+
+    public function getUniqueId(): ?string
+    {
+        return $this->unique_id;
+    }
+
+    public function setUniqueId(string $unique_id): self
+    {
+        $this->unique_id = $unique_id;
+
+        return $this;
+    }
+
+    public function isIsSent(): ?bool
+    {
+        return $this->is_sent;
+    }
+
+    public function setIsSent(bool $is_sent): self
+    {
+        $this->is_sent = $is_sent;
 
         return $this;
     }

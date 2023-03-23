@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace App\Input;
 
 use App\Enum\NotificationType;
+use App\Repository\NotificationMessageRepository;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class SMSNotificationInput implements NotificationInputInterface
 {
 
     private string $type = NotificationType::SMS->value;
+
+    private string $uniqueId;
 
     #[Assert\NotBlank()]
     #[Assert\Length(max: 100)]
@@ -24,7 +29,15 @@ class SMSNotificationInput implements NotificationInputInterface
     #[Assert\Length(max: 500)]
     private ?string $messageText = null;
 
-    private bool $sent = false;
+    #[Assert\NotBlank()]
+    #[Assert\Length(max: 255)]
+    private string $userId;
+
+
+    public function __construct(?string $uniqueId = null)
+    {
+        $this->uniqueId = $uniqueId ?? uniqid();
+    }
 
     public function getType() : string
     {
@@ -34,6 +47,17 @@ class SMSNotificationInput implements NotificationInputInterface
     public function setType(string $type) : self
     {
         $this->type = $type;
+        return $this;
+    }
+
+    public function getUniqueId() : string
+    {
+        return $this->uniqueId;
+    }
+
+    public function setUniqueId(string $uniqueId) : self
+    {
+        $this->uniqueId = $uniqueId;
         return $this;
     }
 
@@ -59,14 +83,14 @@ class SMSNotificationInput implements NotificationInputInterface
         return $this;
     }
 
-    public function isSent() : bool
+    public function getUserId() : string
     {
-        return $this->sent;
+        return $this->userId;
     }
 
-    public function setSent(bool $sent) : self
+    public function setUserId(string $userId) : self
     {
-        $this->sent = $sent;
+        $this->userId = $userId;
         return $this;
     }
 

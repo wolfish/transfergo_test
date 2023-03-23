@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\ParamConverter;
 
-use App\Input\NotificationInputInterface;
 use App\Input\SMSNotificationInput;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\Request;

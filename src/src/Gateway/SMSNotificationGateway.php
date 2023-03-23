@@ -4,39 +4,63 @@ declare(strict_types=1);
 
 namespace App\Gateway;
 
+use App\Entity\NotificationMessage;
 use App\Enum\NotificationType;
-use App\Message\MessageInterface;
-use Symfony\Component\Notifier\TexterInterface;
-use Symfony\Component\Notifier\Message\SmsMessage;
+use App\Message\NotificationMessageInterface;
+use App\Message\SMSNotificationMessage;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Notifier\Notification\Notification;
+use Symfony\Component\Notifier\NotifierInterface;
+use Symfony\Component\Notifier\Recipient\Recipient;
 
 class SMSNotificationGateway implements NotificationGatewayInterface
 {
 
-    protected NotificationType $type;
+    private NotificationType $type;
 
-    protected MessageInterface $message;
+    private SMSNotificationMessage $message;
 
-    private TexterInterface $texter;
+    private NotifierInterface $notifier;
 
-    public function __construct(TexterInterface $texter)
+    private NotificationMessage $notification;
+
+    private EntityManagerInterface $manager;
+
+    public function __construct(
+        NotifierInterface $notifier, 
+        NotificationMessage $notification, 
+        EntityManagerInterface $manager
+    )
     {
         $this->setType(NotificationType::SMS);
-        $this->texter = $texter;
+        $this->notifier = $notifier;
+        $this->notification = $notification;
+        $this->manager = $manager;
     }
 
     public function send() : bool
     {
-        $sms = new SmsMessage(
-            $this->message->getRecipient(),
-            $this->message->getMessageText()
+        $notification = new Notification(
+            $this->message->getMessageText(), 
+            ['sms']
         );
 
-        $sentMessage = $this->texter->send($sms);
+        $recipient = new Recipient(
+            phone: $this->message->getRecipient()
+        );
 
+        try {
+            $this->notifier->send($notification, $recipient);
+        } catch (\Exception $e) {
+            $this->updateNotificationMessage($this->notification, false);
+            return false;
+        }
+
+        $this->updateNotificationMessage($this->notification, true);
         return true;
     }
 
-    public function setMessage(MessageInterface $message) : self
+    public function setMessage(NotificationMessageInterface $message) : self
     {
         $this->message = $message;
         return $this;
@@ -53,9 +77,20 @@ class SMSNotificationGateway implements NotificationGatewayInterface
         return $this;
     }
 
-    protected function incorrectMessageType() : void
+    private function updateNotificationMessage(
+        NotificationMessage $notificationMessage,
+        bool $isSent
+    ) : NotificationMessage
     {
-        throw new \Exception('Incorrect message class ' . $this->message::class . ' for gateway ' . self::class);
+        $notificationMessage->setIsSent($isSent);
+        $notificationMessage->setUpdated(new \DateTime('now'));
+
+        $this->manager->persist($notificationMessage);
+        $this->manager->flush();
+
+        return $notificationMessage;
     }
+
+    
 
 }

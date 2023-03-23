@@ -12,5 +12,9 @@ interface NotificationInputInterface
     public function getRecipient() : string;
 
     public function getMessageText() : string;
+
+    public function getUserId() : string;
+
+    public function getUniqueId() : string;
     
 }

@@ -12,7 +12,7 @@ framework:
             failure: "%env(MESSENGER_TRANSPORT_DSN_FAILED)%"
 
         routing:
-            'App\Message\MessageInterface': notification
+            'App\Message\NotificationMessageInterface': notification
 
 # when@test:
 #    framework:

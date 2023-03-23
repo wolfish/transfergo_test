@@ -20,8 +20,22 @@ class ExceptionResponse extends JsonResponse
         }
         $this->setData([
             'message' => 'Request validation error',
-            'code' => 0,
+            'code' => self::HTTP_BAD_REQUEST,
             'fields' => $formattedErrors
+        ]);
+
+        return $this;
+    }
+
+    public function userThrottleResponse() : self
+    {
+        $this->setStatusCode(self::HTTP_TOO_MANY_REQUESTS);
+        $this->setData([
+            'message' => 'Too many requests for this userId',
+            'code' => self::HTTP_TOO_MANY_REQUESTS,
+            'fields' => [
+                'userId' => 'Too many requests'
+            ]
         ]);
 
         return $this;

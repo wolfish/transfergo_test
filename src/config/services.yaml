@@ -4,6 +4,8 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    app.user_throttle_hours: '%env(USER_THROTTLE_HOURS)%'
+    app.user_throttle_limit: '%env(USER_THROTTLE_LIMIT)%'
 
 services:
     # default configuration for services in *this* file
@@ -29,10 +31,3 @@ services:
             - '@doctrine'
         tags:
             - { name: request.param_converter, converter: sms_notification_param_converter }
-
-    app.param_converter.email_notification_param_converter:
-        class: App\ParamConverter\EmailNotificationParamConverter
-        arguments:
-            - '@doctrine'
-        tags:
-            - { name: request.param_converter, converter: email_notification_param_converter }
