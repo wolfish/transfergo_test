@@ -4,13 +4,9 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Entity\NotificationMessage;
 use App\Exception\ExceptionResponse;
-use App\Factory\NotificationFactory;
-use App\Input\NotificationInputInterface;
 use App\Input\SMSNotificationInput;
 use App\Repository\NotificationMessageRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -23,23 +19,15 @@ use Symfony\Component\Messenger\MessageBusInterface;
 class NotificationController extends AbstractController
 {
 
-    private EntityManagerInterface $manager;
-
-    private NotificationFactory $factory;
-
     private MessageBusInterface $queue;
 
     private NotificationMessageRepository $repository;
 
     public function __construct(
-        EntityManagerInterface $manager, 
-        NotificationFactory $factory, 
         MessageBusInterface $queue,
         NotificationMessageRepository $repository
     )
     {
-        $this->manager = $manager;
-        $this->factory = $factory;
         $this->queue = $queue;
         $this->repository = $repository;
     }
@@ -93,29 +81,11 @@ class NotificationController extends AbstractController
             return $throttleResponse;
         }
 
-        $notification = $this->createNotificationMessage($myMessage);
-        $this->manager->persist($notification);
-        $this->manager->flush();
-
-        $message = $this->factory->createMessage($myMessage);
-        $this->queue->dispatch($message);
+        $this->queue->dispatch($myMessage);
         
         return new JsonResponse([
-            'messageId' => $message->getUniqueId()
+            'messageId' => $myMessage->getUniqueId()
         ], Response::HTTP_CREATED);
-    }
-
-    private function createNotificationMessage(NotificationInputInterface $input) : NotificationMessage
-    {
-        $notification = new NotificationMessage();
-        $notification->setType($input->getType());
-        $notification->setUserId($input->getUserId());
-        $notification->setRecipient($input->getRecipient());
-        $notification->setMessageText($input->getMessageText());
-        $notification->setUniqueId($input->getUniqueId());
-        $notification->setCreated(new \DateTime('now'));
-
-        return $notification;
     }
 
     private function checkUserThrottle(string $userId) : ?JsonResponse

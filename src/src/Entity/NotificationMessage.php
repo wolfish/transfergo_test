@@ -14,7 +14,7 @@ class NotificationMessage
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private int $id;
 
     #[ORM\Column(length: 50)]
     private string $type;
@@ -26,10 +26,13 @@ class NotificationMessage
     private string $user_id;
 
     #[ORM\Column(length: 100)]
-    private ?string $recipient = null;
+    private string $recipient;
 
     #[ORM\Column(length: 500)]
-    private ?string $message_text = null;
+    private string $message_text;
+
+    #[ORM\Column(length: 500, nullable: true)]
+    private ?string $error_message = null;
 
     #[ORM\Column(options: [
         'default' => false
@@ -39,17 +42,17 @@ class NotificationMessage
     #[ORM\Column(type: Types::DATETIME_MUTABLE, options: [
         'default' => 'CURRENT_TIMESTAMP'
     ])]
-    private ?\DateTimeInterface $created = null;
+    private \DateTimeInterface $created;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updated = null;
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function getRecipient(): ?string
+    public function getRecipient(): string
     {
         return $this->recipient;
     }
@@ -61,7 +64,7 @@ class NotificationMessage
         return $this;
     }
 
-    public function getMessageText(): ?string
+    public function getMessageText(): string
     {
         return $this->message_text;
     }
@@ -73,7 +76,7 @@ class NotificationMessage
         return $this;
     }
 
-    public function getCreated(): ?\DateTimeInterface
+    public function getCreated(): \DateTimeInterface
     {
         return $this->created;
     }
@@ -97,7 +100,7 @@ class NotificationMessage
         return $this;
     }
 
-    public function getType(): ?string
+    public function getType(): string
     {
         return $this->type;
     }
@@ -109,7 +112,7 @@ class NotificationMessage
         return $this;
     }
 
-    public function getUserId(): ?string
+    public function getUserId(): string
     {
         return $this->user_id;
     }
@@ -121,7 +124,7 @@ class NotificationMessage
         return $this;
     }
 
-    public function getUniqueId(): ?string
+    public function getUniqueId(): string
     {
         return $this->unique_id;
     }
@@ -133,7 +136,7 @@ class NotificationMessage
         return $this;
     }
 
-    public function isIsSent(): ?bool
+    public function isIsSent(): bool
     {
         return $this->is_sent;
     }
@@ -141,6 +144,18 @@ class NotificationMessage
     public function setIsSent(bool $is_sent): self
     {
         $this->is_sent = $is_sent;
+
+        return $this;
+    }
+
+    public function getErrorMessage(): ?string
+    {
+        return $this->error_message;
+    }
+
+    public function setErrorMessage(?string $error_message): self
+    {
+        $this->error_message = $error_message;
 
         return $this;
     }
