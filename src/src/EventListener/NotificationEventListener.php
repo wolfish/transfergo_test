@@ -42,6 +42,7 @@ class NotificationEventListener
         ]);
 
         $notificationMessage = $this->updateNotificationMessage($message, $notificationMessage);
+        $notificationMessage->setIsSent($event instanceof SentMessageEvent);
         $notificationMessage->setErrorMessage(
             $event instanceof FailedMessageEvent ? 
                 $event->getError()->getMessage() : null
