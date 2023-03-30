@@ -38,7 +38,7 @@ class MessageConsumer
             'unique_id' => $message->getUniqueId()
         ]);
 
-        $gateway = $this->factory->createGateway($message, $this->transport, $notification);
+        $gateway = $this->factory->createGateway($this->transport, $notification);
         
         return $gateway->send();
     }

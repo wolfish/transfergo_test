@@ -9,6 +9,7 @@ use App\Enum\NotificationType;
 use App\Gateway\NotificationGatewayInterface;
 use App\Gateway\SMSNotificationGateway;
 use App\Input\NotificationInputInterface;
+use App\Message\CustomMessage;
 use App\Message\NotificationMessageInterface;
 use App\Message\SMSNotificationMessage;
 use Doctrine\ORM\EntityManagerInterface;
@@ -26,14 +27,13 @@ class NotificationFactory
     }
 
     public function createGateway(
-        NotificationMessageInterface $message, 
         NotifierInterface $transport,
         NotificationMessage $notification
     ) : NotificationGatewayInterface
     {
-        switch ($message->getType()) {
+        switch ($notification->getType()) {
             
-            case NotificationType::SMS:
+            case NotificationType::SMS->value:
                 $gateway = new SMSNotificationGateway($transport, $notification, $this->manager);
                 break;
 
@@ -42,7 +42,6 @@ class NotificationFactory
 
         }
 
-        $gateway->setMessage($message);
         return $gateway;
     }
 
@@ -51,9 +50,10 @@ class NotificationFactory
         switch ($input->getType()) {
             
             case NotificationType::SMS->value:
-                return new SMSNotificationMessage(
+                return new CustomMessage(
                     $input->getRecipient(),
                     $input->getMessageText(),
+                    type: NotificationType::SMS,
                     userId: $input->getUserId(),
                     uniqueId: $input->getUniqueId()
                 );

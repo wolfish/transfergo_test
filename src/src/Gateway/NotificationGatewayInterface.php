@@ -9,8 +9,6 @@ use App\Message\NotificationMessageInterface;
 interface NotificationGatewayInterface
 {
 
-    public function setMessage(NotificationMessageInterface $message) : self;
-
     public function send() : bool;
 
 }
